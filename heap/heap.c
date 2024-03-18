@@ -30,12 +30,18 @@ bool heap_empty(heap h) {
 bool heap_add(heap h, void *object) {   
   if(h->n == h->nmax) return true;
   h->array[++(h->n)] = object;
-  void* temp; 
-  while(h->f(h->array[n],h->array[n/2]) < 0){
-    temp = h->array[n/2];
-    h->array[n/2] = h->array[n];
-    h->array[n] = temp;
+  int fils = h->n, parrent = 1;
+  if (fils != 1) parrent = (fils%2 == 0) ? fils/2 : (fils - 1)/2;  
+  while ((h->f( h->array[fils],h->array[parrent]) ) < 0){
+    //j'échange
+    void* temp = h->array[parrent];
+    h->array[parrent] = h->array[fils];
+    h->array[fils] = temp;
+    //rechercer le nouveaux parrent 
+    fils = parrent;
+    if (fils != 1) parrent = (fils%2 == 0) ? fils/2 : (fils - 1)/2;  
   }
+
   return false;
 }
 
@@ -45,10 +51,31 @@ void *heap_top(heap h) {
 }
 
 //manque cette fonction
+
 void *heap_pop(heap h) {
   if(heap_empty(h)) return NULL;
   void* premier = heap_top(h);
   h->array[1] = h->array[h->n];
-  h->array[(h->n)--] = premier;
+  h->array[(h->n)--] = premier; 
+  //rechercer le fils plus petit
+  int parrent = 1;
+  while( h->f(h->array[parrent],h->array[2*parrent]) > 0  || h->f(h->array[parrent],h->array[2*parrent+1]) > 0 )
+  {
+    void* temp = h->array[parrent];
+    if(h->f(h->array[2*parrent],h->array[2*parrent+1]) < 0 ){
+      h->array[parrent] = h->array[2*parrent];
+      h->array[2*parrent] = temp;
+      parrent = (2*parrent < (h->n)/2 ) ? 2*parrent: 1; //Preciser dans la condition de parrent 
+    }else{
+      h->array[parrent] = h->array[2*parrent+1];
+      h->array[2*parrent+1] = temp;
+      parrent = (2*parrent+1 < ((h->n) -1 )/2 ) ? 2*parrent+1: 1; //Preciser dans la condition de parrent 
+    }
+    //verifier si noveaux parrent à des filles 
+
+    
+      
+  }
+  
   return premier;
 }
